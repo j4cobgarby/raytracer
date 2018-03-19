@@ -22,10 +22,17 @@ void camera_calculate_w_h(camera* cam) {
 }
 
 float camera_calculate_ray_yaw(camera* cam, unsigned int pixel_x) {
-    return cam->yaw + atan((cam->w/2 - (float)pixel_x*(cam->w/(float)cam->res_x)) * M_PI/180);
+    float result = (pixel_x < cam->res_x/2 ? -1 : 1) * atan(fabs(
+                    (cam->w * (float)pixel_x)/((float)cam->res_x) - ((cam->w)/2.0)
+                    )) * 180.0/M_PI;
+
+    return result + cam->yaw;
 }
 
 float camera_calculate_ray_pitch(camera* cam, unsigned int pixel_y) {
-    return cam->pitch + atan((cam->h/2 - (float)pixel_y*(cam->h/(float)cam->res_y)) * M_PI/180);
-}
+    float result = (pixel_y < cam->res_y/2 ? -1 : 1) * atan(fabs(
+                    (cam->h * (float)pixel_y)/((float)cam->res_y) - ((cam->h)/2.0)
+                    )) * 180.0/M_PI;
 
+    return result + cam->pitch;
+}

@@ -47,13 +47,17 @@ int main() {
         .origin = (vec3d){0,0,0},
         .yaw    = 0,
         .pitch  = 0,
-        .fov    = 85,
+        .fov    = 20,
         // ..leave w and h undefined for now
-        .res_x  = 800,
-        .res_y  = 500
+        .res_x  = 80,
+        .res_y  = 50
     };
 
     camera_calculate_w_h(&cam);
 
     printf("Camera:\nw: %f\nh: %f\n", cam.w, cam.h);
+
+    for (unsigned int i = 0; i <= cam.res_x; i++) {
+        printf("%d => %f\n", i, camera_calculate_ray_yaw(&cam, i));
+    }
 }

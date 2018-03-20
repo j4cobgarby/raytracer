@@ -35,4 +35,3 @@ void render_triangle_to_surface(camera* cam, tri3d* triangle, SDL_Surface* surf)
 
     SDL_UnlockSurface(surf);
 }
-

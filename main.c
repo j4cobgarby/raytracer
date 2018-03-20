@@ -19,7 +19,9 @@
 #include <math.h>
 #include <string.h>
 
+#include "img.h"
 #include "camera.h"
+#include "render.h"
 
 /*
 int main(int argc, char** argv) {
@@ -43,21 +45,25 @@ int main(int argc, char** argv) {
 */
 
 int main() {
+    SDL_Surface* surf;
+    tri3d tri1 = {
+       (vec3d){2.34962, 0.21173, 0.06036},
+       (vec3d){1.50993, -0.29166, -0.47957},
+       (vec3d){1.64327, -0.21173, 0.62760}
+    };
     camera cam = {
         .origin = (vec3d){0,0,0},
         .yaw    = 0,
         .pitch  = 0,
-        .fov    = 20,
+        .fov    = 85,
         // ..leave w and h undefined for now
-        .res_x  = 80,
-        .res_y  = 50
+        .res_x  = 800,
+        .res_y  = 500
     };
 
+    surf = create_surface(cam.res_x, cam.res_y);
     camera_calculate_w_h(&cam);
-
-    printf("Camera:\nw: %f\nh: %f\n", cam.w, cam.h);
-
-    for (unsigned int i = 0; i <= cam.res_x; i++) {
-        printf("%d => %f\n", i, camera_calculate_ray_yaw(&cam, i));
-    }
+    
+    render_triangle_to_surface(&cam, &tri1, 0xff0000ff, surf);
+    SDL_SaveBMP(surf, "out.bmp");
 }

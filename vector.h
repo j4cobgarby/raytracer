@@ -35,6 +35,7 @@ typedef struct {
     vec3d p2;
 } tri3d;
 
+vec3d vec3d_from_pitch_yaw(float pitch, float yaw, vec3d* out);
 vec3d vec3d_add(vec3d a, vec3d b, vec3d* out);
 vec3d vec3d_sub(vec3d a, vec3d b, vec3d* out);
 vec3d vec3d_cross(vec3d u, vec3d v, vec3d* out);

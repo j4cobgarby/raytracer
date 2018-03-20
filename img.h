@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
-void set_pixel(SDL_Surface* surf, int x, int y, Uint32 pix);
+void put_pixel(SDL_Surface* surf, int x, int y, Uint32 pixel);
 SDL_Surface* create_surface(int width, int height);
 
 #endif

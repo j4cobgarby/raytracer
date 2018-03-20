@@ -17,6 +17,21 @@
 
 #include "vector.h"
 
+vec3d vec3d_from_pitch_yaw(float pitch, float yaw, vec3d* out) {
+    float xzlen = cos(pitch * (M_PI/180));
+    vec3d result = {
+        xzlen * cos(yaw * (M_PI/180)),
+        sin(pitch * (M_PI/180)),
+        xzlen * sin(-yaw * (M_PI/180))
+    };
+
+    if (out != NULL) {
+        memcpy(out, &result, sizeof(vec3d));
+    }
+
+    return result;
+}
+
 vec3d vec3d_add(vec3d a, vec3d b, vec3d* out) {
     vec3d result = {
         a.x + b.x,

@@ -30,7 +30,7 @@ float camera_calculate_ray_yaw(camera* cam, unsigned int pixel_x) {
 }
 
 float camera_calculate_ray_pitch(camera* cam, unsigned int pixel_y) {
-    float result = (pixel_y < cam->res_y/2 ? -1 : 1) * atan(fabs(
+    float result = -(pixel_y < cam->res_y/2 ? -1 : 1) * atan(fabs(
                     (cam->h * (float)pixel_y)/((float)cam->res_y) - ((cam->h)/2.0)
                     )) * 180.0/M_PI;
 

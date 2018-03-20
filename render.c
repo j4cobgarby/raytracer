@@ -14,7 +14,7 @@
  */
 #include "render.h"
 
-void render_triangle_to_surface(camera* cam, tri3d* triangle, Uint32 colour, SDL_Surface* surf) {
+void render_triangle_to_surface(camera* cam, tri3d* triangle, SDL_Surface* surf) {
     float ray_pitch, ray_yaw;
     vec3d ray_vector;
     vec3d poi; // point of intersection
@@ -26,8 +26,9 @@ void render_triangle_to_surface(camera* cam, tri3d* triangle, Uint32 colour, SDL
             ray_pitch = camera_calculate_ray_pitch(cam, y);
             ray_yaw = camera_calculate_ray_yaw(cam, x);
             vec3d_from_pitch_yaw(ray_pitch, ray_yaw, &ray_vector);
+
             if (ray_intersect_tri(cam->origin, ray_vector, triangle, &poi)) {
-                put_pixel(surf, x, y, colour);
+                put_pixel(surf, x, y, triangle->mat.diffuse);
             }
         }
     }

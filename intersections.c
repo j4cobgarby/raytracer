@@ -5,9 +5,7 @@
  *
  *    Description:  Implementation of intersections.h
  *
- *        Version:  1.0
  *        Created:  17/03/18 13:14:33
- *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  Jacob

@@ -5,9 +5,7 @@
  *
  *    Description:  Render header
  *
- *        Version:  1.0
  *        Created:  19/03/18 19:00:41
- *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  Jacob

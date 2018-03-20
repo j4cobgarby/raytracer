@@ -5,9 +5,7 @@
  *
  *    Description:  header for the camera struct
  *
- *        Version:  1.0
  *        Created:  18/03/18 12:46:13
- *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  Jacob

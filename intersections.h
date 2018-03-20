@@ -5,9 +5,7 @@
  *
  *    Description:  Declarations of some functions for checking intersections, etc.
  *
- *        Version:  1.0
  *        Created:  17/03/18 13:01:24
- *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  Jacob 

@@ -5,9 +5,7 @@
  *
  *    Description:  Vector implementation
  *
- *        Version:  1.0
  *        Created:  17/03/18 13:07:27
- *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  Jacob

@@ -5,9 +5,7 @@
  *
  *    Description:  implementation of img.h
  *
- *        Version:  1.0
  *        Created:  17/03/18 13:29:57
- *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  Jacob

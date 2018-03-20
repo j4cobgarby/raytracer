@@ -5,15 +5,14 @@
  *
  *    Description:  Raycaster main
  *
- *        Version:  1.0
  *        Created:  17/03/18 00:30:14
- *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  Jacob
  *
  * =====================================================================================
  */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>

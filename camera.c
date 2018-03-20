@@ -5,15 +5,14 @@
  *
  *    Description:  Camera implementation
  *
- *        Version:  1.0
  *        Created:  18/03/18 13:27:19
- *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  Jacob
  *
  * =====================================================================================
  */
+
 #include "camera.h"
 
 void camera_calculate_w_h(camera* cam) {

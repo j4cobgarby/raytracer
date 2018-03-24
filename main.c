@@ -47,10 +47,10 @@ int main() {
         .origin = (vec3d){0,0,0},
         .yaw    = 0,
         .pitch  = 0,
-        .fov    = 90,
+        .fov    = 85,
         // ..leave w and h undefined for now
-        .res_x  = 800,
-        .res_y  = 500
+        .res_x  = 1080,
+        .res_y  = 720
     };
     point_light light1 = {
         (vec3d){2.0, 0.5, 0.0}

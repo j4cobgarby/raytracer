@@ -139,5 +139,6 @@ void vec3d_print(vec3d v);
  */
 void tri3d_print(tri3d t);
 
+void vec3d_norm(vec3d* v);
 
 #endif

@@ -15,6 +15,13 @@
 
 #include "vector.h"
 
+void vec3d_norm(vec3d* vec) {
+    float length = sqrtf(vec->x*vec->x + vec->y*vec->y + vec->z*vec->z);
+    vec->x /= length;
+    vec->y /= length;
+    vec->z /= length;
+}
+
 vec3d vec3d_from_pitch_yaw(float pitch, float yaw, vec3d* out) {
     float xzlen = cos(pitch * (M_PI/180));
     vec3d result = {

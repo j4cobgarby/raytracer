@@ -18,8 +18,6 @@ int can_see_light(scene* sc, vec3d check_point, int ignore_index) {
     vec3d ray_direction;
     vec3d hitpoint;
 
-    //printf("Checking %d point light%s.\n", sc->amount_pointlights, (sc->amount_pointlights == 1 ? "" : "s"));
-
     for (int i = 0; i < sc->amount_pointlights; i++) {
         vec3d_sub(sc->pointlights[i].pos, check_point, &ray_direction);
         for (int j = 0; j < sc->amount_tris; j++) {

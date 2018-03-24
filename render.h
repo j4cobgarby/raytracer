@@ -25,6 +25,27 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
+/** \brief Checks if a any light in a scene is illuminating a point.
+ *  
+ *  For rendering shadows, the following algorithm is applied:
+ *
+ *      1 : When a ray hits a triangle, a new ray is cast from the point of intersection
+ *          to each light.
+ *      
+ *      2 : If the new ray intersects a triangle on its way to the ray, that means light
+ *          isn't reaching it. To check this, use the ray_intersect_tri function, and also
+ *          compare the distance from the initial point of intersection to the new point
+ *          of intersection with the potentially obstructive triangle.
+ *
+ *      3 : If light isn't reaching a pixel, draw it in black.
+ *
+ *  To avoid graphical glitchiness on the surface of a triangle (noise-like patterns), the
+ *  triangle which the point of intersection is on is ignored when checking for obstruction.
+ *
+ *  \param sc A pointer to the scene which contains all the lights, and triangles.
+ *  \param check_point The point whose illumination you wish to know.
+ *  \param ignore_index The index in the scene of the triangle which the point lies on.
+ */
 int can_see_light(scene* sc, vec3d check_point, int ignore_index);
 
 /** \brief Renders a single triangle in three-dimensional space to
@@ -40,19 +61,6 @@ int can_see_light(scene* sc, vec3d check_point, int ignore_index);
  *  \param surf The SDL surface pointer to render the triangle to.
  */
 void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf);
-
-/** \brief Not implemented yet!! Render multiple triangles (a mesh) to the surface.
- *
- *  Generally, you'll programatically generate the array of triangles, but if you want
- *  to manually type out an object, feel free. This uses a Z-buffer to speed up rendering
- *  by only rendering objects which are seen! Handy.
- *
- *  \param cam A pointer to the camera to render from.
- *  \param triangles A pointer to the first pointer to a triangle in an array of `num' triangle pointers.
- *  \param num The amount of triangle pointers.
- *  \param surf The SDL surface pointer to render the triangle to.
- */
-void render_triangles_to_surface(camera* cam, tri3d** triangles, int num, SDL_Surface* surf);
 
 void render_scene_to_surface(scene* sc, SDL_Surface* surf);
 

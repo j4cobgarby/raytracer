@@ -14,20 +14,64 @@
  */
 #include "render.h"
 
+int can_see_specific_light(scene* sc, vec3d check_point, int ignore_index, int light_index) {
+    vec3d ray_direction;
+    vec3d hitpoint;
+
+    vec3d_sub(sc->pointlights[light_index].pos, check_point, &ray_direction);
+    for (int j = 0; j < sc->amount_tris; j++) {
+        if (j != ignore_index) {
+            if (ray_intersect_tri(check_point, ray_direction, &sc->tris[j], &hitpoint)) {
+                if (vec3d_distsquared(check_point, hitpoint, NULL) <= 
+                            vec3d_distsquared(check_point, sc->pointlights[light_index].pos, NULL)) return 0;
+            }
+        } 
+    }
+
+    return 1;
+}
+
 int can_see_light(scene* sc, vec3d check_point, int ignore_index) {
     vec3d ray_direction;
     vec3d hitpoint;
 
     for (int i = 0; i < sc->amount_pointlights; i++) {
-        vec3d_sub(sc->pointlights[i].pos, check_point, &ray_direction);
-        for (int j = 0; j < sc->amount_tris; j++) {
-            if (j != ignore_index) {
-               if (ray_intersect_tri(check_point, ray_direction, &sc->tris[j], &hitpoint)) return 0;
-            }      
-        }
+        if (can_see_specific_light(sc, check_point, ignore_index, i)) return 1; 
     }
 
-    return 1;
+    return 0;
+}
+
+float calculate_light_intensity(scene* sc, vec3d check_point, int ignore_index) {
+    float intensity;
+    float distance_squared;
+
+    if (!can_see_light(sc, check_point, ignore_index)) return 0;
+
+    for (int i = 0; i < sc->amount_pointlights; i++) {
+        // Use the inverse square law to calculate the actual intensity
+        vec3d_distsquared(check_point, sc->pointlights[i].pos, &distance_squared);
+        intensity += sc->pointlights[i].energy / distance_squared; 
+    }
+
+    return intensity;
+}
+
+Uint32 multiply_colour(Uint32 colour, float scalar) {
+    // 0xRRGGBBAA
+    int r,g,b,a;
+    Uint32 result;
+
+    r = colour >> 24;
+    g = (colour >> 16) & 0xff;
+    b = (colour >> 8) & 0xff;
+    a = colour & 0xff;
+
+    r = (r*scalar>0xff?0xff:r*scalar);
+    g = (g*scalar>0xff?0xff:g*scalar);
+    b = (b*scalar>0xff?0xff:b*scalar);
+
+    result = (Uint32)(r<<24)+(g<<16)+(b<<8)+a;
 }
 
 void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf) {
@@ -55,7 +99,9 @@ void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf
             if (ray_intersect_tri(cam->origin, ray_vector, triangle, &poi)) {
                 pixel_colour = triangle->mat.diffuse;
 
-                if (!can_see_light(sc, poi, triangle_index)) {
+                if (can_see_light(sc, poi, triangle_index)) {
+                    pixel_colour = multiply_colour(pixel_colour, calculate_light_intensity(sc, poi, triangle_index));
+                } else {
                     pixel_colour = 0x000000ff;
                 }
 

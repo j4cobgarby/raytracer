@@ -22,6 +22,8 @@ void vec3d_norm(vec3d* vec) {
     vec->z /= length;
 }
 
+
+
 vec3d vec3d_from_pitch_yaw(float pitch, float yaw, vec3d* out) {
     float xzlen = cos(pitch * (M_PI/180));
     vec3d result = {
@@ -91,6 +93,27 @@ vec3d vec3d_scale(vec3d u, float s, vec3d* out) {
     }
 
     return result;
+}
+
+float vec3d_distsquared(vec3d a, vec3d b, float* out) {
+    vec3d between = vec3d_sub(a, b, NULL);
+    float distsquared = between.x*between.x + between.y*between.y + between.z*between.z;
+
+    if (out != NULL) {
+        *out = distsquared;
+    }
+
+    return distsquared;
+}
+
+float vec3d_dist(vec3d a, vec3d b, float* out) {
+    float dist = sqrt(vec3d_distsquared(a, b, NULL));
+
+    if (out != NULL) {
+        *out = dist;
+    }
+
+    return dist;
 }
 
 float vec3d_dot(vec3d u, vec3d v, float* out) {

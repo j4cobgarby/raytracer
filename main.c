@@ -53,7 +53,8 @@ int main() {
         .res_y  = 720
     };
     point_light light1 = {
-        (vec3d){2.0, 0.5, 0.0}
+        (vec3d){2.0, 0.5, 0.05},
+        0.8
     };
 
     sc.tris = malloc(sizeof(tri3d) * 3);

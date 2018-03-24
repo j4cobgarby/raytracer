@@ -24,6 +24,7 @@
 
 typedef struct {
     vec3d pos;
+    float energy; // where intensity = energy/distance^2
 } point_light;
 
 #endif

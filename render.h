@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <SDL2/SDL.h>
+#include <math.h>
 
 /** \brief Checks if a any light in a scene is illuminating a point.
  *  
@@ -47,6 +48,12 @@
  *  \param ignore_index The index in the scene of the triangle which the point lies on.
  */
 int can_see_light(scene* sc, vec3d check_point, int ignore_index);
+
+int can_see_specific_light(scene* sc, vec3d check_point, int ignore_index, int light_index);
+
+float calculate_light_intensity(scene* sc, vec3d check_point, int ignore_index);
+
+Uint32 multiply_colour(Uint32 colour, float scalar);
 
 /** \brief Renders a single triangle in three-dimensional space to
  *         a surface.

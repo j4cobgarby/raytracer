@@ -141,4 +141,7 @@ void tri3d_print(tri3d t);
 
 void vec3d_norm(vec3d* v);
 
+float vec3d_distsquared(vec3d a, vec3d b, float* out);
+float vec3d_dist(vec3d a, vec3d b, float* out);
+
 #endif

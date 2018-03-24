@@ -1,7 +1,7 @@
 SRC = *.c
 CC  = /usr/bin/gcc
 CC_FLAGS = -Wall -Wextra -g
-LD_FLAGS = -lSDL2 -lm
+LD_FLAGS = -lSDL2 -lm -g
 EXE = raycaster
 
 all : $(SRC)

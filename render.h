@@ -19,9 +19,13 @@
 #include "img.h"
 #include "vector.h"
 #include "camera.h"
+#include "light.h"
+#include "scene.h"
 
 #include <stdlib.h>
 #include <SDL2/SDL.h>
+
+int can_see_light(scene* sc, vec3d check_point, int ignore_index);
 
 /** \brief Renders a single triangle in three-dimensional space to
  *         a surface.
@@ -35,7 +39,7 @@
  *  \param triangle A pointer to the triangle to render, which includes the material.
  *  \param surf The SDL surface pointer to render the triangle to.
  */
-void render_triangle_to_surface(camera* cam, tri3d* triangle, SDL_Surface* surf);
+void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf);
 
 /** \brief Not implemented yet!! Render multiple triangles (a mesh) to the surface.
  *
@@ -49,5 +53,7 @@ void render_triangle_to_surface(camera* cam, tri3d* triangle, SDL_Surface* surf)
  *  \param surf The SDL surface pointer to render the triangle to.
  */
 void render_triangles_to_surface(camera* cam, tri3d** triangles, int num, SDL_Surface* surf);
+
+void render_scene_to_surface(scene* sc, SDL_Surface* surf);
 
 #endif

@@ -7,4 +7,4 @@ other raytracter - wouldn't be.
 
 ## Examples
 
-![Example 1](out.bmp)
+![Example 1](examples/out.bmp)

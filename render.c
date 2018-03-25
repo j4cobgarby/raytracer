@@ -77,13 +77,14 @@ Uint32 multiply_colour(Uint32 colour, float scalar) {
     return result;
 }
 
-void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf) {
+void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf, float** zbuff) {
     float ray_pitch, ray_yaw;
     Uint32 pixel_colour;
     vec3d ray_vector;
     vec3d poi; // point of intersection
     tri3d* triangle;
     camera* cam;
+    float distance_squared;
 
     triangle = &(sc->tris[triangle_index]);
     cam = &(sc->cam);
@@ -100,6 +101,13 @@ void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf
             pixel_colour = 0x000000ff;
 
             if (ray_intersect_tri(cam->origin, ray_vector, triangle, &poi)) {
+                vec3d_distsquared(cam->origin, poi, &distance_squared);
+                if (distance_squared > zbuff[x][y]) {
+                    printf("CONTINUING because of %f <= %f\n", distance_squared, zbuff[x][y]);
+                    continue;
+                }
+                zbuff[x][y] = distance_squared;
+
                 pixel_colour = triangle->mat.diffuse;
 
                 if (can_see_light(sc, poi, triangle_index)) {
@@ -117,7 +125,15 @@ void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf
 }
 
 void render_scene_to_surface(scene* sc, SDL_Surface* surf) {
+    float** zbuff = malloc(sizeof(float*) * sc->cam.res_x);
+    for (int i = 0; i < sc->cam.res_x; i++) {
+        zbuff[i] = malloc(sizeof(float) * sc->cam.res_y);
+        for (int j = 0; j < sc->cam.res_y; j++) {
+            zbuff[i][j] = INFINITY;
+        }
+    }
+
     for (int i = 0; i < sc->amount_tris; i++) {
-        render_triangle_to_surface(sc, i, surf);
+        render_triangle_to_surface(sc, i, surf, zbuff);
     }
 }

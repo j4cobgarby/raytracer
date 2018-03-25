@@ -67,7 +67,7 @@ Uint32 multiply_colour(Uint32 colour, float scalar);
  *  \param triangle A pointer to the triangle to render, which includes the material.
  *  \param surf The SDL surface pointer to render the triangle to.
  */
-void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf);
+void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf, float** zbuff);
 
 void render_scene_to_surface(scene* sc, SDL_Surface* surf);
 

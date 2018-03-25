@@ -49,7 +49,6 @@ obj read_OBJ(const char* path) {
 
     amount_file_lines = get_amount_lines(fp);
 
-    printf("Amount of lines: %ld\n", amount_file_lines);
     lines = malloc(sizeof(char*) * amount_file_lines);
     rewind(fp);
 
@@ -95,10 +94,6 @@ obj read_OBJ(const char* path) {
             break;
         case 'f':
             faces_temp = parse_face(lines[i]);
-            printf(" == == == == %d, %d, %d\n", faces_temp[0]-1, faces_temp[3]-1, faces_temp[6]-1);
-            printf("\t -> %f, %f, %f\n", result.verts[faces_temp[0] - 1].x,
-                    result.verts[faces_temp[0] - 1].y,
-                    result.verts[faces_temp[0] - 1].z);
             *front_tris = (tri3d){
                 result.verts[faces_temp[0] - 1],
                 result.verts[faces_temp[3] - 1],
@@ -108,16 +103,6 @@ obj read_OBJ(const char* path) {
             front_tris++;
             break;
         }
-    }
-
-    printf("Amount of vertices: %d\nAmount of tris: %d\n", amount_vertices, amount_faces);
-
-    for (int i = 0; i < amount_vertices; i++) {
-        vec3d_print(result.verts[i]);
-    }
-
-    for (int i = 0; i < amount_faces; i++) {
-        tri3d_print(result.tris[i]);
     }
 
     fclose(fp);

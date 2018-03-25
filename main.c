@@ -86,12 +86,17 @@ int main() {
 }
 */
 
-int main() {
+int main(int argc, char** argv) {
     SDL_Surface* surf;
     scene sc;
-    obj cube;
+    obj shape;
 
-    cube = read_OBJ("objs/cube.obj");
+    if (argc != 2) {
+        printf("Usage: raycaster <.obj file path>\n");
+        exit(EXIT_FAILURE);
+    }
+
+    shape = read_OBJ(argv[1]);
     
     sc.cam = (camera){
         .origin = (vec3d){-6, 2.5, 2.5},
@@ -102,15 +107,15 @@ int main() {
         .res_y  = 720
     };
 
-    sc.amount_tris = cube.amount_tris;
-    sc.tris = cube.tris;
+    sc.amount_tris = shape.amount_tris;
+    sc.tris = shape.tris;
 
     sc.ambient_intensity = 0.2;
 
     sc.amount_pointlights = 1;
     sc.pointlights = malloc(sizeof(point_light) * sc.amount_pointlights);
     sc.pointlights[0] = (point_light){
-        .pos = (vec3d){-2.28037, 2.17283, 0},
+        .pos = (vec3d){-2.28037, 2.49864, -0.58885},
         .energy = 1.1
     };
 

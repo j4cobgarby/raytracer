@@ -2,7 +2,7 @@
 
 if /usr/bin/make ; then
     echo "=========== RUNNING ============="
-    `pwd`/raycaster
+    `pwd`/raycaster $1
 else
     echo "!!! Build failed!"
 fi

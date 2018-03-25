@@ -89,8 +89,6 @@ void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf
     triangle = &(sc->tris[triangle_index]);
     cam = &(sc->cam);
 
-    tri3d_print(*triangle);
-
     SDL_LockSurface(surf);
 
     for (unsigned int y = 0; y < cam->res_y; y++) {
@@ -103,7 +101,6 @@ void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf
             if (ray_intersect_tri(cam->origin, ray_vector, triangle, &poi)) {
                 vec3d_distsquared(cam->origin, poi, &distance_squared);
                 if (distance_squared > zbuff[x][y]) {
-                    printf("CONTINUING because of %f <= %f\n", distance_squared, zbuff[x][y]);
                     continue;
                 }
                 zbuff[x][y] = distance_squared;

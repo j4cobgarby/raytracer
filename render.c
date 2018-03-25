@@ -46,6 +46,8 @@ float calculate_light_intensity(scene* sc, vec3d check_point, int ignore_index) 
     float intensity;
     float distance_squared;
 
+    intensity = sc->ambient_intensity;
+
     if (!can_see_light(sc, check_point, ignore_index)) return 0;
 
     for (int i = 0; i < sc->amount_pointlights; i++) {
@@ -58,7 +60,6 @@ float calculate_light_intensity(scene* sc, vec3d check_point, int ignore_index) 
 }
 
 Uint32 multiply_colour(Uint32 colour, float scalar) {
-    // 0xRRGGBBAA
     int r,g,b,a;
     Uint32 result;
 
@@ -72,6 +73,8 @@ Uint32 multiply_colour(Uint32 colour, float scalar) {
     b = (b*scalar>0xff?0xff:b*scalar);
 
     result = (Uint32)(r<<24)+(g<<16)+(b<<8)+a;
+
+    return result;
 }
 
 void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf) {
@@ -102,7 +105,7 @@ void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf
                 if (can_see_light(sc, poi, triangle_index)) {
                     pixel_colour = multiply_colour(pixel_colour, calculate_light_intensity(sc, poi, triangle_index));
                 } else {
-                    pixel_colour = 0x000000ff;
+                    pixel_colour = multiply_colour(pixel_colour, sc->ambient_intensity);
                 }
 
                 put_pixel(surf, x, y, pixel_colour);

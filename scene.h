@@ -24,8 +24,8 @@ typedef struct {
     tri3d* tris;
     point_light* pointlights;
     camera cam;
-
     int amount_tris, amount_pointlights;
+    float ambient_intensity;
 } scene;
 
 #endif

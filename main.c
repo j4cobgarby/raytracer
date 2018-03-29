@@ -23,68 +23,7 @@
 #include "render.h"
 #include "obj.h"
 #include "scene.h"
-
-/*
-int main() {
-    SDL_Surface* surf;
-    scene sc;
-
-    camera cam = {
-        .origin = (vec3d){0,0,0},
-        .yaw    = 0,
-        .pitch  = 0,
-        .fov    = 85,
-        // ..leave w and h undefined for now
-        .res_x  = 1080,
-        .res_y  = 720
-    };
-
-    sc.tris = malloc(sizeof(tri3d) * 3);
-    sc.amount_tris = 3;
-
-    sc.tris[0] = (tri3d) {
-       (vec3d){2.5, 0.2, 0},
-       (vec3d){1.5, -0.3, -0.5},
-       (vec3d){1.5, -0.2, 0.5},
-
-       (material){.diffuse = 0x00ff00ff}
-    };
-    sc.tris[1] = (tri3d) {
-        (vec3d){3.0, 1.5, 1.5},
-        (vec3d){3.0, 0.5, 1.0},
-        (vec3d){2.5, 0.7, 2.0},
-
-        (material){.diffuse = 0xff0000ff}
-    };
-
-    sc.tris[2] = (tri3d) {
-        (vec3d){2.0, 0.2, -0.1},
-        (vec3d){1.8, 0.1, -0.2},
-        (vec3d){1.8, 0.1, 0.0},
-        
-        (material){.diffuse = 0x0000ffff}
-    };
-
-    sc.pointlights = malloc(sizeof(point_light) * 1);
-    sc.amount_pointlights = 1;
-    sc.pointlights[0] = (point_light) {
-        (vec3d){2.0, 0.5, 0.05},
-        0.8
-    };
-
-    sc.cam = cam;
-    sc.ambient_intensity = 0.1;
-
-    surf = create_surface(cam.res_x, cam.res_y);
-    camera_calculate_w_h(&sc.cam);
-    
-    render_scene_to_surface(&sc, surf);
-
-    printf("Rendered. Saving...\n");
-
-    SDL_SaveBMP(surf, "out.bmp");
-}
-*/
+#include "C-Thread-Pool/thpool.h"
 
 int main(int argc, char** argv) {
     SDL_Surface* surf;
@@ -97,33 +36,38 @@ int main(int argc, char** argv) {
     }
 
     shape = read_OBJ(argv[1]);
-    
+
     sc.cam = (camera){
         .origin = (vec3d){-6, 2.5, 2.5},
         .yaw    = 20,
-        .pitch  = -18,
+        .pitch  = -10,
         .fov    = 85,
-        .res_x  = 1080,
-        .res_y  = 720
+        .res_x  = 800,
+        .res_y  = 500
     };
 
     sc.amount_tris = shape.amount_tris;
     sc.tris = shape.tris;
 
-    sc.ambient_intensity = 0.2;
+    sc.ambient_intensity = 0.055;
 
     sc.amount_pointlights = 1;
     sc.pointlights = malloc(sizeof(point_light) * sc.amount_pointlights);
     sc.pointlights[0] = (point_light){
         .pos = (vec3d){-2.28037, 2.49864, -0.58885},
-        .energy = 1.1
+        .energy = 1.5
     };
 
     camera_calculate_w_h(&sc.cam);
 
     surf = create_surface(sc.cam.res_x, sc.cam.res_y);
 
+    printf("Must lock? [%d]\n", SDL_MUSTLOCK(surf));
+
+    printf("Rendering..");
+    fflush(stdout);
     render_scene_to_surface(&sc, surf);
+    printf("Done!\n");
 
     SDL_SaveBMP(surf, "out.bmp");
 }

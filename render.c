@@ -77,6 +77,7 @@ Uint32 multiply_colour(Uint32 colour, float scalar) {
     return result;
 }
 
+/*
 void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf, float** zbuff) {
     float ray_pitch, ray_yaw;
     Uint32 pixel_colour;
@@ -88,8 +89,6 @@ void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf
 
     triangle = &(sc->tris[triangle_index]);
     cam = &(sc->cam);
-
-    SDL_LockSurface(surf);
 
     for (unsigned int y = 0; y < cam->res_y; y++) {
         for (unsigned int x = 0; x < cam->res_x; x++) {
@@ -117,12 +116,78 @@ void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf
             }
         }
     }
+}
 
+void render_triangle_to_surface_thread(void* args) {
+    scene* sc;
+    int triangle_index;
+    SDL_Surface* surf;
+    float** zbuff;
+
+    render_args* r_args = (render_args*)args;
+
+    render_triangle_to_surface(r_args->sc, r_args->triangle_index, r_args->surf, r_args->zbuff);
+
+    printf(".");
+    fflush(stdout);
+}
+*/
+void render_scene_at_xy(scene* sc, SDL_Surface* surf, float** zbuff, int x, int y) {
+    int closest_triangle_index = -1;
+
+    float ray_pitch = camera_calculate_ray_pitch(&sc->cam, y);
+    float ray_yaw   = camera_calculate_ray_yaw(&sc->cam, x);
+    float distance_squared;
+
+    vec3d ray_direction = vec3d_from_pitch_yaw(ray_pitch, ray_yaw, NULL);
+    vec3d poi;
+    vec3d closest_poi;
+
+    Uint32 pix_colour = 0x000000ff;
+
+    for (int i = 0; i < sc->amount_tris; i++) {
+        if (ray_intersect_tri(sc->cam.origin, ray_direction, &sc->tris[i], &poi)) {
+            if (vec3d_distsquared(sc->cam.origin, poi, &distance_squared) < zbuff[x][y]) {
+                zbuff[x][y] = distance_squared;
+                closest_triangle_index = i;
+                closest_poi = poi;
+            }
+        }
+    }
+
+    if (closest_triangle_index > 0) {
+        // hit a triangle, this is the closest, so render it!
+
+        pix_colour = sc->tris[closest_triangle_index].mat.diffuse;
+
+        if (can_see_light(sc, closest_poi, closest_triangle_index)) {
+            pix_colour = multiply_colour(pix_colour, calculate_light_intensity(sc, closest_poi, closest_triangle_index));
+        } else {
+            pix_colour = multiply_colour(pix_colour, sc->ambient_intensity);
+        }
+    }
+
+    SDL_LockSurface(surf);
+    put_pixel(surf, x, y, pix_colour);
     SDL_UnlockSurface(surf);
+}
+
+void render_scene_at_xy_thread(void* args) {
+    scene* sc;
+    SDL_Surface* surf;
+    float** zbuff;
+    int x;
+    int y;
+
+    render_args* rargs = (render_args*)args;
+    render_scene_at_xy(rargs->sc, rargs->surf, rargs->zbuff, rargs->x, rargs->y);
 }
 
 void render_scene_to_surface(scene* sc, SDL_Surface* surf) {
     float** zbuff = malloc(sizeof(float*) * sc->cam.res_x);
+    render_args*** args_array;
+    threadpool thpool = thpool_init(200); // make 8 threads
+
     for (int i = 0; i < sc->cam.res_x; i++) {
         zbuff[i] = malloc(sizeof(float) * sc->cam.res_y);
         for (int j = 0; j < sc->cam.res_y; j++) {
@@ -130,7 +195,32 @@ void render_scene_to_surface(scene* sc, SDL_Surface* surf) {
         }
     }
 
-    for (int i = 0; i < sc->amount_tris; i++) {
-        render_triangle_to_surface(sc, i, surf, zbuff);
+    args_array = malloc(sizeof(render_args**) * sc->cam.res_y);
+    for (int y = 0; y < sc->cam.res_y; y++) {
+        args_array[y] = malloc(sizeof(render_args*) * sc->cam.res_x);
+        for (int x = 0; x < sc->cam.res_x; x++) {
+            args_array[y][x] = malloc(sizeof(render_args));
+            args_array[y][x]->sc = sc;
+            args_array[y][x]->surf = surf;
+            args_array[y][x]->x = x;
+            args_array[y][x]->y = y;
+            args_array[y][x]->zbuff = zbuff;
+        }
     }
+
+    printf("Arguments allocated...\n");
+
+    for (int y = 0; y < sc->cam.res_y; y++) {
+        for (int x = 0; x < sc->cam.res_x; x++) {
+            thpool_add_work(thpool, (void*)render_scene_at_xy_thread, (void*)args_array[y][x]);
+        }
+    }
+
+    thpool_wait(thpool);
+    
+    printf("Done rendering.\n");
+
+    thpool_destroy(thpool);
+
+    printf("Destroyed threadpool\n");
 }

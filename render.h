@@ -21,10 +21,19 @@
 #include "camera.h"
 #include "light.h"
 #include "scene.h"
+#include "C-Thread-Pool/thpool.h"
 
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <math.h>
+
+typedef struct {
+    scene* sc;
+    SDL_Surface* surf;
+    float** zbuff;
+    int x;
+    int y;
+} render_args;
 
 /** \brief Checks if a any light in a scene is illuminating a point.
  *  
@@ -68,6 +77,8 @@ Uint32 multiply_colour(Uint32 colour, float scalar);
  *  \param surf The SDL surface pointer to render the triangle to.
  */
 void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf, float** zbuff);
+
+void render_scene_at_xy(scene*, SDL_Surface*, float**, int, int);
 
 void render_scene_to_surface(scene* sc, SDL_Surface* surf);
 

@@ -1,6 +1,6 @@
-SRC = *.c C-Thread-Pool/thpool.c
+SRC = *.c
 CC  = /usr/bin/gcc
-CC_FLAGS = -Wall -Wextra -O3
+CC_FLAGS = -Wall -Wextra -g
 LD_FLAGS = -lSDL2 -lm -pthread
 EXE = raycaster
 

@@ -23,7 +23,7 @@
 #include "render.h"
 #include "obj.h"
 #include "scene.h"
-#include "C-Thread-Pool/thpool.h"
+#include "thpool.h"
 
 int main(int argc, char** argv) {
     SDL_Surface* surf;
@@ -38,23 +38,23 @@ int main(int argc, char** argv) {
     shape = read_OBJ(argv[1]);
 
     sc.cam = (camera){
-        .origin = (vec3d){-6, 2.5, 2.5},
-        .yaw    = 20,
-        .pitch  = -10,
+        .origin = (vec3d){-1.82544, 0.50102, -0.68972},
+        .yaw    = -16.8,
+        .pitch  = -16.8,
         .fov    = 85,
-        .res_x  = 800,
+        .res_x  = 500,
         .res_y  = 500
     };
 
     sc.amount_tris = shape.amount_tris;
     sc.tris = shape.tris;
 
-    sc.ambient_intensity = 0.055;
+    sc.ambient_intensity = 0.2;
 
     sc.amount_pointlights = 1;
     sc.pointlights = malloc(sizeof(point_light) * sc.amount_pointlights);
     sc.pointlights[0] = (point_light){
-        .pos = (vec3d){-2.28037, 2.49864, -0.58885},
+        .pos = (vec3d){-1.14685, 1.11385, -1.36285},
         .energy = 1.5
     };
 

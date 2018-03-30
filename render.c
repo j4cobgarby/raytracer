@@ -32,8 +32,6 @@ int can_see_specific_light(scene* sc, vec3d check_point, int ignore_index, int l
 }
 
 int can_see_light(scene* sc, vec3d check_point, int ignore_index) {
-    vec3d ray_direction;
-    vec3d hitpoint;
 
     for (int i = 0; i < sc->amount_pointlights; i++) {
         if (can_see_specific_light(sc, check_point, ignore_index, i)) return 1; 
@@ -45,6 +43,7 @@ int can_see_light(scene* sc, vec3d check_point, int ignore_index) {
 float calculate_light_intensity(scene* sc, vec3d check_point, int ignore_index) {
     float intensity;
     float distance_squared;
+    float angle_to_light;
 
     intensity = sc->ambient_intensity;
 
@@ -53,7 +52,13 @@ float calculate_light_intensity(scene* sc, vec3d check_point, int ignore_index) 
     for (int i = 0; i < sc->amount_pointlights; i++) {
         // Use the inverse square law to calculate the actual intensity
         vec3d_distsquared(check_point, sc->pointlights[i].pos, &distance_squared);
-        intensity += sc->pointlights[i].energy / distance_squared; 
+        angle_to_light = vec3d_angle(
+                calc_face_normal(sc->tris[ignore_index].p0, sc->tris[ignore_index].p1, sc->tris[ignore_index].p2,
+                                            sc->tris[ignore_index].n0, sc->tris[ignore_index].n1, sc->tris[ignore_index].n2
+                                             ), 
+                vec3d_sub(sc->pointlights[i].pos, tri3d_center(&sc->tris[ignore_index], NULL), NULL), 
+                NULL);
+        intensity += (sc->pointlights[i].energy / distance_squared) * (90.0f-angle_to_light)/90.0f; 
     }
 
     return intensity;
@@ -77,61 +82,6 @@ Uint32 multiply_colour(Uint32 colour, float scalar) {
     return result;
 }
 
-/*
-void render_triangle_to_surface(scene* sc, int triangle_index, SDL_Surface* surf, float** zbuff) {
-    float ray_pitch, ray_yaw;
-    Uint32 pixel_colour;
-    vec3d ray_vector;
-    vec3d poi; // point of intersection
-    tri3d* triangle;
-    camera* cam;
-    float distance_squared;
-
-    triangle = &(sc->tris[triangle_index]);
-    cam = &(sc->cam);
-
-    for (unsigned int y = 0; y < cam->res_y; y++) {
-        for (unsigned int x = 0; x < cam->res_x; x++) {
-            ray_pitch = camera_calculate_ray_pitch(cam, y);
-            ray_yaw = camera_calculate_ray_yaw(cam, x);
-            vec3d_from_pitch_yaw(ray_pitch, ray_yaw, &ray_vector);
-            pixel_colour = 0x000000ff;
-
-            if (ray_intersect_tri(cam->origin, ray_vector, triangle, &poi)) {
-                vec3d_distsquared(cam->origin, poi, &distance_squared);
-                if (distance_squared > zbuff[x][y]) {
-                    continue;
-                }
-                zbuff[x][y] = distance_squared;
-
-                pixel_colour = triangle->mat.diffuse;
-
-                if (can_see_light(sc, poi, triangle_index)) {
-                    pixel_colour = multiply_colour(pixel_colour, calculate_light_intensity(sc, poi, triangle_index));
-                } else {
-                    pixel_colour = multiply_colour(pixel_colour, sc->ambient_intensity);
-                }
-
-                put_pixel(surf, x, y, pixel_colour);
-            }
-        }
-    }
-}
-
-void render_triangle_to_surface_thread(void* args) {
-    scene* sc;
-    int triangle_index;
-    SDL_Surface* surf;
-    float** zbuff;
-
-    render_args* r_args = (render_args*)args;
-
-    render_triangle_to_surface(r_args->sc, r_args->triangle_index, r_args->surf, r_args->zbuff);
-
-    printf(".");
-    fflush(stdout);
-}
-*/
 void render_scene_at_xy(scene* sc, SDL_Surface* surf, float** zbuff, int x, int y) {
     int closest_triangle_index = -1;
 
@@ -173,12 +123,6 @@ void render_scene_at_xy(scene* sc, SDL_Surface* surf, float** zbuff, int x, int 
 }
 
 void render_scene_at_xy_thread(void* args) {
-    scene* sc;
-    SDL_Surface* surf;
-    float** zbuff;
-    int x;
-    int y;
-
     render_args* rargs = (render_args*)args;
     render_scene_at_xy(rargs->sc, rargs->surf, rargs->zbuff, rargs->x, rargs->y);
 }
@@ -186,19 +130,19 @@ void render_scene_at_xy_thread(void* args) {
 void render_scene_to_surface(scene* sc, SDL_Surface* surf) {
     float** zbuff = malloc(sizeof(float*) * sc->cam.res_x);
     render_args*** args_array;
-    threadpool thpool = thpool_init(200); // make 8 threads
+    threadpool thpool = thpool_init(4); // make 8 threads
 
-    for (int i = 0; i < sc->cam.res_x; i++) {
+    for (size_t i = 0; i < sc->cam.res_x; i++) {
         zbuff[i] = malloc(sizeof(float) * sc->cam.res_y);
-        for (int j = 0; j < sc->cam.res_y; j++) {
+        for (size_t j = 0; j < sc->cam.res_y; j++) {
             zbuff[i][j] = INFINITY;
         }
     }
 
     args_array = malloc(sizeof(render_args**) * sc->cam.res_y);
-    for (int y = 0; y < sc->cam.res_y; y++) {
+    for (size_t y = 0; y < sc->cam.res_y; y++) {
         args_array[y] = malloc(sizeof(render_args*) * sc->cam.res_x);
-        for (int x = 0; x < sc->cam.res_x; x++) {
+        for (size_t x = 0; x < sc->cam.res_x; x++) {
             args_array[y][x] = malloc(sizeof(render_args));
             args_array[y][x]->sc = sc;
             args_array[y][x]->surf = surf;
@@ -210,8 +154,8 @@ void render_scene_to_surface(scene* sc, SDL_Surface* surf) {
 
     printf("Arguments allocated...\n");
 
-    for (int y = 0; y < sc->cam.res_y; y++) {
-        for (int x = 0; x < sc->cam.res_x; x++) {
+    for (size_t y = 0; y < sc->cam.res_y; y++) {
+        for (size_t x = 0; x < sc->cam.res_x; x++) {
             thpool_add_work(thpool, (void*)render_scene_at_xy_thread, (void*)args_array[y][x]);
         }
     }

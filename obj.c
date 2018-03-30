@@ -24,12 +24,27 @@ int get_amount_lines(FILE* fp) {
     return result;
 }
 
+vec3d calc_face_normal(vec3d v0, vec3d v1, vec3d v2, vec3d n0, vec3d n1, vec3d n2) {
+    vec3d p0, p1, face_normal, vert_normal;
+    float dot_prod;
+
+    vec3d_sub(v1, v0, &p0);
+    vec3d_sub(v2, v0, &p1);
+    vec3d_cross(p0, p1, &face_normal);
+
+    vert_normal = n0;
+    vec3d_dot(face_normal, vert_normal, &dot_prod);
+
+    return (dot_prod < 0.f) ? vec3d_scale(face_normal, -1.f, NULL) : face_normal;
+}
+
 obj read_OBJ(const char* path) {
     FILE* fp;
 
     size_t amount_file_lines = 0;
     size_t amount_vertices = 0; // The amount of vertices in the object. Indices to these are started at 1
     size_t amount_faces = 0; // How many triangles in the object
+    size_t amount_norms = 0;
     size_t len = 0;
     ssize_t chars_read;
 
@@ -40,6 +55,7 @@ obj read_OBJ(const char* path) {
 
     int* faces_temp;
     float* verts_temp;
+    float* norms_temp;
     
     fp = fopen(path, "r");
     if (fp == NULL) {
@@ -62,8 +78,12 @@ obj read_OBJ(const char* path) {
     for (int i = 0; i < amount_file_lines; i++) {
         switch (lines[i][0]) {
         case 'v':
-            if (lines[i][1] == 'n') break;
-            amount_vertices++;
+            if (lines[i][1] == 'n') {
+                amount_norms++;
+            }
+            else {
+                amount_vertices++;
+            }
             break;
         case 'f':
             amount_faces++;
@@ -74,23 +94,33 @@ obj read_OBJ(const char* path) {
     // Set properties in the obj output
     result.amount_verts = amount_vertices;
     result.amount_tris = amount_faces;
+    result.amount_norms = amount_norms;
     result.verts = calloc(sizeof(vec3d), amount_vertices);
     result.tris = calloc(sizeof(tri3d), amount_faces);
+    result.norms = calloc(sizeof(vec3d), amount_norms);
 
     // These two are the current writing place in the arrays
     vec3d* front_verts = result.verts;
     tri3d* front_tris = result.tris;
+    vec3d* front_norms = result.norms;
 
     // This adds all the vertices and faces to the file
     for (int i = 0; i < amount_file_lines; i++) {
         switch (lines[i][0]) {
         case 'v':
-            if (lines[i][1] == 'n') break;
-            verts_temp = parse_vertex(lines[i]);
-            *front_verts = (vec3d){
-                verts_temp[0],verts_temp[1],verts_temp[2]
-            };
-            front_verts++;
+            if (lines[i][1] == 'n') {
+                norms_temp = parse_normal(lines[i]);
+                *front_norms = (vec3d){
+                    norms_temp[0], norms_temp[1], norms_temp[2]
+                };
+                front_norms++;
+            } else {
+                verts_temp = parse_vertex(lines[i]);
+                *front_verts = (vec3d){
+                    verts_temp[0],verts_temp[1],verts_temp[2]
+                };
+                front_verts++;
+            }
             break;
         case 'f':
             faces_temp = parse_face(lines[i]);
@@ -98,6 +128,9 @@ obj read_OBJ(const char* path) {
                 result.verts[faces_temp[0] - 1],
                 result.verts[faces_temp[3] - 1],
                 result.verts[faces_temp[6] - 1],
+                result.norms[faces_temp[2] - 1],
+                result.norms[faces_temp[5] - 1],
+                result.norms[faces_temp[8] - 1],
                 (material){.diffuse = 0xff0000ff}
             };
             front_tris++;
@@ -116,6 +149,12 @@ float* parse_vertex(char* s) {
     return result;
 }
 
+float* parse_normal(char* s) {
+    float* result = calloc(sizeof(int), 3);
+    sscanf(s, "vn %f %f %f", result, result+1, result+2);
+    return result;
+}
+
 int* parse_face(char* s) {
     char* buffer = calloc(sizeof(char), strlen(s));
     char* front_buffer = buffer;
@@ -131,7 +170,9 @@ int* parse_face(char* s) {
 
     for (size_t i = 0; i < strlen(s); i++) {
         if (front_values-values >= 9) {
-            printf("Too many!\n");
+            printf("Too many faces: %s\nSetting values as: ", s);
+            printf("%d %d %d %d %d %d %d %d %d\n",
+                    values[0],values[1],values[2],values[3],values[4],values[5],values[6],values[7],values[8],values[9]);
             break;
         }
         if (s[i] == ' ' || s[i] == '/' || s[i] == '\n') {

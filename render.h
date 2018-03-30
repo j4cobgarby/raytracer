@@ -21,7 +21,8 @@
 #include "camera.h"
 #include "light.h"
 #include "scene.h"
-#include "C-Thread-Pool/thpool.h"
+#include "thpool.h"
+#include "obj.h"
 
 #include <stdlib.h>
 #include <SDL2/SDL.h>

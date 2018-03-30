@@ -40,6 +40,10 @@ typedef struct {
     vec3d p1; /// One vertex of the triangle.
     vec3d p2; /// One vertex of the triangle.
 
+    vec3d n0;
+    vec3d n1;
+    vec3d n2;
+
     material mat; /// The material of the triangle
 } tri3d;
 
@@ -139,9 +143,15 @@ void vec3d_print(vec3d v);
  */
 void tri3d_print(tri3d t);
 
+vec3d tri3d_center(tri3d* t, vec3d* out);
+
 void vec3d_norm(vec3d* v);
 
 float vec3d_distsquared(vec3d a, vec3d b, float* out);
 float vec3d_dist(vec3d a, vec3d b, float* out);
+
+float vec3d_magnitude(vec3d a, float* out);
+
+float vec3d_angle(vec3d a, vec3d b, float* out);
 
 #endif

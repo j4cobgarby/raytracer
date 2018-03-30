@@ -5,5 +5,7 @@ raycaster
 *.jpg
 *~
 docs
+objs
+*.obj
 
 !examples/*

@@ -62,8 +62,6 @@ int main(int argc, char** argv) {
 
     surf = create_surface(sc.cam.res_x, sc.cam.res_y);
 
-    printf("Must lock? [%d]\n", SDL_MUSTLOCK(surf));
-
     printf("Rendering..");
     fflush(stdout);
     render_scene_to_surface(&sc, surf);

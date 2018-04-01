@@ -38,18 +38,19 @@ int main(int argc, char** argv) {
     shape = read_OBJ(argv[1]);
 
     sc.cam = (camera){
-        .origin = (vec3d){-1.82544, 0.50102, -0.68972},
-        .yaw    = -16.8,
-        .pitch  = -16.8,
-        .fov    = 85,
-        .res_x  = 500,
-        .res_y  = 500
+        .origin = (vec3d){-4.84913, 2.92571, 0.80132},
+        .yaw    = 12.2,
+        .pitch  = -20.8,
+        .fov    = 66,
+        .res_x  = 300,
+        .res_y  = 300
     };
 
     sc.amount_tris = shape.amount_tris;
     sc.tris = shape.tris;
 
-    sc.ambient_intensity = 0.2;
+    sc.ambient_intensity = 0.12;
+    sc.background_colour = 0x000000ff;
 
     sc.amount_pointlights = 1;
     sc.pointlights = malloc(sizeof(point_light) * sc.amount_pointlights);

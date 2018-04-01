@@ -93,7 +93,7 @@ void render_scene_at_xy(scene* sc, SDL_Surface* surf, float** zbuff, int x, int 
     vec3d poi;
     vec3d closest_poi;
 
-    Uint32 pix_colour = 0x000000ff;
+    Uint32 pix_colour = sc->background_colour;
 
     for (int i = 0; i < sc->amount_tris; i++) {
         if (ray_intersect_tri(sc->cam.origin, ray_direction, &sc->tris[i], &poi)) {
@@ -125,12 +125,14 @@ void render_scene_at_xy(scene* sc, SDL_Surface* surf, float** zbuff, int x, int 
 void render_scene_at_xy_thread(void* args) {
     render_args* rargs = (render_args*)args;
     render_scene_at_xy(rargs->sc, rargs->surf, rargs->zbuff, rargs->x, rargs->y);
+    *(rargs->pixels_rendered)++;
 }
 
 void render_scene_to_surface(scene* sc, SDL_Surface* surf) {
     float** zbuff = malloc(sizeof(float*) * sc->cam.res_x);
     render_args*** args_array;
     threadpool thpool = thpool_init(4); // make 8 threads
+    int pixels_rendered;
 
     for (size_t i = 0; i < sc->cam.res_x; i++) {
         zbuff[i] = malloc(sizeof(float) * sc->cam.res_y);
@@ -149,6 +151,7 @@ void render_scene_to_surface(scene* sc, SDL_Surface* surf) {
             args_array[y][x]->x = x;
             args_array[y][x]->y = y;
             args_array[y][x]->zbuff = zbuff;
+            args_array[y][x]->pixels_rendered = &pixels_rendered;
         }
     }
 

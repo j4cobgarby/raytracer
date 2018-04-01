@@ -29,6 +29,7 @@ typedef struct {
     int amount_tris, /// The amount of triangles in `tris`
         amount_pointlights; /// The amount of pointlights in `pointlights`
     float ambient_intensity; /// The ambient intensity of the scene
+    Uint32 background_colour;
 } scene;
 
-#endif
+#endif 

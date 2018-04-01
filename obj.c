@@ -131,7 +131,7 @@ obj read_OBJ(const char* path) {
                 result.norms[faces_temp[2] - 1],
                 result.norms[faces_temp[5] - 1],
                 result.norms[faces_temp[8] - 1],
-                (material){.diffuse = 0xff0000ff}
+                (material){.diffuse = 0xffffffff}
             };
             front_tris++;
             break;

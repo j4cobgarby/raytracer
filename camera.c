@@ -16,12 +16,12 @@
 #include "camera.h"
 
 void camera_calculate_w_h(camera* cam) {
-    cam->w = 2 * tan((cam->fov/2) * M_PI/180);
+    cam->w = 2 * tan((cam->fov/2.0) * M_PI/180);
     cam->h = ((float)cam->res_y/(float)cam->res_x)*cam->w;
 }
 
 float camera_calculate_ray_yaw(camera* cam, unsigned int pixel_x) {
-    float result = (pixel_x < cam->res_x/2 ? -1 : 1) * atan(fabs(
+    float result = -(pixel_x < cam->res_x/2 ? -1 : 1) * atan(fabs(
                     (cam->w * (float)pixel_x)/((float)cam->res_x) - ((cam->w)/2.0)
                     )) * 180.0/M_PI;
 

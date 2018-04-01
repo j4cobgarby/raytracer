@@ -39,6 +39,8 @@ typedef struct {
     float** zbuff; /// The zbuffer
     int x; /// The x screen-coord to render
     int y; /// The y screen-coord to render
+
+    int* pixels_rendered; /// This is incremented when a pixel is rendered, for the loading bar.
 } render_args;
 
 /** \brief Checks if a any light in a scene is illuminating a point.

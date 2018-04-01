@@ -82,7 +82,7 @@ Uint32 multiply_colour(Uint32 colour, float scalar) {
     return result;
 }
 
-void render_scene_at_xy(scene* sc, SDL_Surface* surf, float** zbuff, int x, int y) {
+inline void render_scene_at_xy(scene* sc, SDL_Surface* surf, float** zbuff, int x, int y) {
     int closest_triangle_index = -1;
 
     float ray_pitch = camera_calculate_ray_pitch(&sc->cam, y);

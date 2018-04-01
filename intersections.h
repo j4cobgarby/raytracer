@@ -33,6 +33,6 @@
  *
  *  \return 1 if there's an intersection, else 0.
  */
-int ray_intersect_tri(vec3d ray_origin, vec3d ray_vector, tri3d* triangle, vec3d* point_of_intersection); 
+inline int ray_intersect_tri(vec3d ray_origin, vec3d ray_vector, tri3d* triangle, vec3d* point_of_intersection); 
 
 #endif

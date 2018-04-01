@@ -41,9 +41,9 @@ int main(int argc, char** argv) {
         .origin = (vec3d){-4.84913, 2.92571, 0.80132},
         .yaw    = 12.2,
         .pitch  = -20.8,
-        .fov    = 66,
-        .res_x  = 300,
-        .res_y  = 300
+        .fov    = 60,
+        .res_x  = 500,
+        .res_y  = 500
     };
 
     sc.amount_tris = shape.amount_tris;

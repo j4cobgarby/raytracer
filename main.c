@@ -69,4 +69,11 @@ int main(int argc, char** argv) {
     printf("Done!\n");
 
     SDL_SaveBMP(surf, "out.bmp");
+
+    free(surf);
+    free(shape.norms);
+    free(shape.tris);
+    free(shape.verts);
+    free(sc.pointlights);
+    free(sc.tris);
 }

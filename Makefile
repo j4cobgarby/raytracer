@@ -1,6 +1,6 @@
 SRC = *.c
 CC  = /usr/bin/gcc
-CC_FLAGS = -Wall -Wextra -Ofast
+CC_FLAGS = -Wall -Wextra -O2 -g
 LD_FLAGS = -lSDL2 -lm -pthread
 EXE = raycaster
 

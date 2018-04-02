@@ -164,10 +164,22 @@ void render_scene_to_surface(scene* sc, SDL_Surface* surf) {
     }
 
     thpool_wait(thpool);
-    
     printf("Done rendering.\n");
-
     thpool_destroy(thpool);
-
     printf("Destroyed threadpool\n");
+    
+    for (size_t i = 0; i < sc->cam.res_x; i++) {
+        free(zbuff[i]);
+    }
+    free(zbuff);
+    printf("Destroyed Z-Buffer\n");
+    
+    for (size_t y = 0; y < sc->cam.res_y; y++) {
+        for (size_t x = 0; x < sc->cam.res_x; x++) {
+            free(args_array[y][x]);
+        }
+        free(args_array[y]);
+    }
+    free(args_array);
+    printf("Destroyed argument array\n");
 }

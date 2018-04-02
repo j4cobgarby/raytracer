@@ -139,7 +139,14 @@ obj read_OBJ(const char* path) {
     }
 
     fclose(fp);
-
+    free(line);
+    for (size_t i = 0; i < amount_file_lines; i++) free(lines[i]);
+    free(lines);
+    free(faces_temp);
+    free(verts_temp);
+    free(norms_temp);
+    free(fp);
+    
     return result;
 }
 

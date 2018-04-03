@@ -40,9 +40,13 @@ typedef struct {
     vec3d p1; /// One vertex of the triangle.
     vec3d p2; /// One vertex of the triangle.
 
-    vec3d n0;
-    vec3d n1;
-    vec3d n2;
+    vec3d t0; /// The UV coordinate of vertex 0
+    vec3d t1; /// The UV coordinate of vertex 1
+    vec3d t2; /// The UV coordinate of vertex 2
+
+    vec3d n0; /// The normal at vertex 0
+    vec3d n1; /// The normal at vertex 1
+    vec3d n2; /// The normal at vertex 2
 
     material mat; /// The material of the triangle
 } tri3d;

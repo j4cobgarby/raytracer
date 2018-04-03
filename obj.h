@@ -36,10 +36,12 @@
 typedef struct {
     vec3d* verts; /// Array of the vertices in the object.
     vec3d* norms; /// Array of vertex normals in the object.
+    vec3d* uvs; /// Array of uv coordinates
     tri3d* tris; /// Array of triangles in the object.
     int amount_verts; /// Amount of vertices.
     int amount_tris; /// Amount of triangles.
     int amount_norms; /// Amount of vertex normals.
+    int amount_uvs;
 } obj;
 
 /** \brief Returns the amount of lines in a the file pointed to by fp.
@@ -100,6 +102,8 @@ float* parse_vertex(char*);
  */
 float* parse_normal(char*);
 
+float* parse_uv(char*);
+
 /** \brief Parses a face in an .obj file to an array of integers.
  *
  *  Faces are stored like this:
@@ -107,7 +111,7 @@ float* parse_normal(char*);
  *  \code
  *  f v0/t0/n0 v1/t1/n1 v2/t2/n2
  *  \endcode
- *
+ 
  *  This function simply reads the values, in order, into an array of 9 integers.
  *
  *  \param s The string.

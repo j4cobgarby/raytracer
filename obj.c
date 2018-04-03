@@ -45,6 +45,7 @@ obj read_OBJ(const char* path) {
     size_t amount_vertices = 0; // The amount of vertices in the object. Indices to these are started at 1
     size_t amount_faces = 0; // How many triangles in the object
     size_t amount_norms = 0;
+    size_t amount_uvs = 0;
     size_t len = 0;
     ssize_t chars_read;
 
@@ -56,6 +57,7 @@ obj read_OBJ(const char* path) {
     int* faces_temp;
     float* verts_temp;
     float* norms_temp;
+    float* uvs_temp;
     
     fp = fopen(path, "r");
     if (fp == NULL) {
@@ -80,6 +82,8 @@ obj read_OBJ(const char* path) {
         case 'v':
             if (lines[i][1] == 'n') {
                 amount_norms++;
+            } else if (lines[i][1] == 't') {
+                amount_uvs++;
             }
             else {
                 amount_vertices++;
@@ -95,14 +99,17 @@ obj read_OBJ(const char* path) {
     result.amount_verts = amount_vertices;
     result.amount_tris = amount_faces;
     result.amount_norms = amount_norms;
+    result.amount_uvs = amount_uvs;
     result.verts = calloc(sizeof(vec3d), amount_vertices);
     result.tris = calloc(sizeof(tri3d), amount_faces);
     result.norms = calloc(sizeof(vec3d), amount_norms);
+    result.uvs = calloc(sizeof(vec3d), amount_uvs);
 
-    // These two are the current writing place in the arrays
+    // These are the current writing place in the arrays
     vec3d* front_verts = result.verts;
     tri3d* front_tris = result.tris;
     vec3d* front_norms = result.norms;
+    vec3d* front_uvs = result.uvs;
 
     // This adds all the vertices and faces to the file
     for (int i = 0; i < amount_file_lines; i++) {
@@ -114,6 +121,13 @@ obj read_OBJ(const char* path) {
                     norms_temp[0], norms_temp[1], norms_temp[2]
                 };
                 front_norms++;
+            
+            } else if (lines[i][1] == 't') {
+                uvs_temp = parse_uv(lines[i]);
+                *front_uvs = (vec3d){
+                    uvs_temp[0], uvs_temp[1], uvs_temp[2]
+                };
+                front_uvs++;
             } else {
                 verts_temp = parse_vertex(lines[i]);
                 *front_verts = (vec3d){
@@ -128,6 +142,9 @@ obj read_OBJ(const char* path) {
                 result.verts[faces_temp[0] - 1],
                 result.verts[faces_temp[3] - 1],
                 result.verts[faces_temp[6] - 1],
+                result.uvs[faces_temp[1] - 1],
+                result.uvs[faces_temp[4] - 1],
+                result.uvs[faces_temp[7] - 1],
                 result.norms[faces_temp[2] - 1],
                 result.norms[faces_temp[5] - 1],
                 result.norms[faces_temp[8] - 1],
@@ -139,26 +156,25 @@ obj read_OBJ(const char* path) {
     }
 
     fclose(fp);
-    free(line);
-    for (size_t i = 0; i < amount_file_lines; i++) free(lines[i]);
-    free(lines);
-    free(faces_temp);
-    free(verts_temp);
-    free(norms_temp);
-    free(fp);
     
     return result;
 }
 
 float* parse_vertex(char* s) {
-    float* result = calloc(sizeof(int), 3);
+    float* result = calloc(sizeof(float), 3);
     sscanf(s, "v %f %f %f", result, result+1, result+2);
     return result;
 }
 
 float* parse_normal(char* s) {
-    float* result = calloc(sizeof(int), 3);
+    float* result = calloc(sizeof(float), 3);
     sscanf(s, "vn %f %f %f", result, result+1, result+2);
+    return result;
+}
+
+float* parse_uv(char* s) {
+    float* result = calloc(sizeof(float), 3);
+    sscanf(s, "vt %f %f %f", result, result+1, result+2);
     return result;
 }
 
@@ -169,11 +185,10 @@ int* parse_face(char* s) {
     int* front_values = values;
 
     if (s[0] != 'f') {
-        printf("Not a valid face");
-        return;
-    } else {
-        s += 2; // set string pointer to beginning of actual string data
+        printf("Not a valid face, but I'll try to parse it anyway I guess.");
     }
+
+    s += 2; // set string pointer to beginning of actual string data
 
     for (size_t i = 0; i < strlen(s); i++) {
         if (front_values-values >= 9) {
@@ -184,7 +199,7 @@ int* parse_face(char* s) {
         }
         if (s[i] == ' ' || s[i] == '/' || s[i] == '\n') {
             int value = atoi(buffer);
-            if (value == 0) value = -1;
+            if (value <= 0) value = -1;
             *front_values = value;
             front_values++;
             memset(buffer, 0, strlen(buffer));

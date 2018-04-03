@@ -37,11 +37,17 @@ int main(int argc, char** argv) {
 
     shape = read_OBJ(argv[1]);
 
+    printf("Object has:\n\
+\t%d triangles,\n\
+\t%d vertices\n\
+\t%d normals\n\
+\t%d uv coords\n", shape.amount_tris, shape.amount_verts, shape.amount_norms, shape.amount_uvs);
+
     sc.cam = (camera){
         .origin = (vec3d){-4.84913, 2.92571, 0.80132},
         .yaw    = 12.2,
         .pitch  = -20.8,
-        .fov    = 60,
+        .fov    = 85,
         .res_x  = 500,
         .res_y  = 500
     };
@@ -55,7 +61,7 @@ int main(int argc, char** argv) {
     sc.amount_pointlights = 1;
     sc.pointlights = malloc(sizeof(point_light) * sc.amount_pointlights);
     sc.pointlights[0] = (point_light){
-        .pos = (vec3d){-1.14685, 1.11385, -1.36285},
+        .pos = (vec3d){-2.00111, 1.77898, -0.35923},
         .energy = 1.5
     };
 
@@ -69,11 +75,4 @@ int main(int argc, char** argv) {
     printf("Done!\n");
 
     SDL_SaveBMP(surf, "out.bmp");
-
-    free(surf);
-    free(shape.norms);
-    free(shape.tris);
-    free(shape.verts);
-    free(sc.pointlights);
-    free(sc.tris);
 }
